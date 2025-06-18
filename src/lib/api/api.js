@@ -1,26 +1,14 @@
-"use client";
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  setAuthHedar,
   addContact,
   deleteContact,
   fetchContact,
   login,
   refresh,
   register,
-  setAuthHadar,
-} from "./api/api";
-import { useAuthStore } from "@/store/auth/auth";
-
-export const useDeleteContact = () => {
-  const queryCliqnt = useQueryClient();
-  return useMutation({
-    mutationFn: deleteContact,
-    onSuccess: () => {
-      queryCliqnt.invalidateQueries({ queryKey: ["contacts"] });
-    },
-  });
-};
+} from "./api/auth";
+import { useAuthStore } from "@/store/auth";
 
 export const useLogin = () => {
   const { setAuth } = useAuthStore();
@@ -28,6 +16,7 @@ export const useLogin = () => {
     mutationFn: login,
     onSuccess: (data) => {
       setAuth(data);
+      setAuthHedar(data.token);
     },
   });
 };
@@ -38,6 +27,7 @@ export const useRegister = () => {
     mutationFn: register,
     onSuccess: (data) => {
       setAuth(data);
+      setAuthHedar(data.token);
     },
   });
 };
@@ -45,9 +35,12 @@ export const useRegister = () => {
 export const useRefresh = () => {
   const { token, setUser } = useAuthStore();
 
-  setAuthHadar(token);
+  if (token) {
+    setAuthHedar(token);
+  }
+
   return useMutation({
-    mutationFn: token ? refresh : () => {},
+    mutationFn: refresh,
     onSuccess: (data) => {
       if (data) {
         setUser(data);
@@ -56,16 +49,26 @@ export const useRefresh = () => {
   });
 };
 
+export const useFetchContacts = () => {
+  return useQuery({ queryKey: ["contacts"], queryFn: fetchContact });
+};
+
 export const useAddContact = () => {
-  const queryCliqnt = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: addContact,
     onSuccess: () => {
-      queryCliqnt.invalidateQueries({ queryKey: ["contacts"] });
+      queryClient.invalidateQueries(["contacts"]);
     },
   });
 };
 
-export const useFetchContacts = () => {
-  return useQuery({ queryKey: ["contacts"], queryFn: fetchContact });
+export const useDeleteContact = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteContact,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["contacts"]);
+    },
+  });
 };
