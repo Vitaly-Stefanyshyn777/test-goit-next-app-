@@ -1,74 +1,39 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  setAuthHedar,
-  addContact,
-  deleteContact,
-  fetchContact,
-  login,
-  refresh,
-  register,
-} from "./api/auth";
-import { useAuthStore } from "@/store/auth";
+import axios from "axios";
 
-export const useLogin = () => {
-  const { setAuth } = useAuthStore();
-  return useMutation({
-    mutationFn: login,
-    onSuccess: (data) => {
-      setAuth(data);
-      setAuthHedar(data.token);
-    },
-  });
+axios.defaults.baseURL = "https://connections-api.goit.global/";
+
+export const setAuthHedar = (token) => {
+  axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 };
 
-export const useRegister = () => {
-  const { setAuth } = useAuthStore();
-  return useMutation({
-    mutationFn: register,
-    onSuccess: (data) => {
-      setAuth(data);
-      setAuthHedar(data.token);
-    },
-  });
+export const login = async (credential) => {
+  const { data } = await axios.post("/users/login", credential);
+  setAuthHedar(data.token);
+  return data;
 };
 
-export const useRefresh = () => {
-  const { token, setUser } = useAuthStore();
-
-  if (token) {
-    setAuthHedar(token);
-  }
-
-  return useMutation({
-    mutationFn: refresh,
-    onSuccess: (data) => {
-      if (data) {
-        setUser(data);
-      }
-    },
-  });
+export const register = async (credential) => {
+  const { data } = await axios.post("/users/signup", credential);
+  setAuthHedar(data.token);
+  return data;
 };
 
-export const useFetchContacts = () => {
-  return useQuery({ queryKey: ["contacts"], queryFn: fetchContact });
+export const refresh = async () => {
+  const { data } = await axios.get("/users/current");
+  return data;
 };
 
-export const useAddContact = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: addContact,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["contacts"]);
-    },
-  });
+export const fetchContact = async () => {
+  const { data } = await axios.get("/contacts");
+  return data;
 };
 
-export const useDeleteContact = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deleteContact,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["contacts"]);
-    },
-  });
+export const addContact = async (contact) => {
+  const { data } = await axios.post("/contacts", contact);
+  return data;
+};
+
+export const deleteContact = async (contactId) => {
+  const { data } = await axios.delete(`/contacts/${contactId}`);
+  return data;
 };

@@ -8,7 +8,7 @@ import {
   login,
   refresh,
   register,
-  setAuthHadar,
+  setAuthHedar,
 } from "./api/api";
 import { useAuthStore } from "@/store/auth/auth";
 
@@ -43,14 +43,20 @@ export const useRegister = () => {
 };
 
 export const useRefresh = () => {
-  const { token, setUser } = useAuthStore();
+  const { token, setUser, setRefreshing } = useAuthStore();
 
-  setAuthHadar(token);
+  setAuthHedar(token);
   return useMutation({
     mutationFn: token ? refresh : () => {},
+    onMutate: () => {
+      if (token) {
+        setRefreshing();
+      }
+    },
     onSuccess: (data) => {
       if (data) {
         setUser(data);
+        setRefreshing();
       }
     },
   });

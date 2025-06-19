@@ -8,7 +8,6 @@ function Header() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const logout = useAuthStore((state) => state.logout);
 
-  console.log(isLoggedIn);
   return (
     <header>
       <nav>

@@ -11,7 +11,7 @@ function ContactsPage() {
     queryKey: ["contacts"],
     queryFn: fetchContact,
   });
-  console.log(data);
+
   return (
     <section className="space-y-4">
       <ContactForm />

@@ -15,7 +15,7 @@ export const useAuthStore = create(
         logout: () => set({ user: null, token: null, isLoggedIn: false }),
         setRefreshing: () =>
           set((state) => {
-            console.log(state);
+            return { isRefreshing: !state.isRefreshing };
           }),
       }),
       {
